@@ -299,3 +299,51 @@ class PreviewWidgetJS(QWidget):
         """Trigger print dialog for the preview content"""
         if self._page_loaded:
             self.web_view.page().triggerAction(self.web_view.page().WebAction.Print)
+    
+    def scroll_to_heading(self, heading_text: str):
+        """Scroll to a specific heading in the preview"""
+        if not self._page_loaded:
+            return
+        
+        # Escape heading text for JavaScript
+        escaped_heading = (heading_text
+                          .replace('\\', '\\\\')
+                          .replace("'", "\\'")
+                          .replace('"', '\\"')
+                          .replace('\n', '\\n'))
+        
+        script = f"""
+        (function() {{
+            // Find all headings
+            var headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+            var targetHeading = null;
+            
+            // Search for matching heading
+            for (var i = 0; i < headings.length; i++) {{
+                var headingText = headings[i].textContent.trim();
+                if (headingText === '{escaped_heading}') {{
+                    targetHeading = headings[i];
+                    break;
+                }}
+            }}
+            
+            // Scroll to heading if found
+            if (targetHeading) {{
+                targetHeading.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+                
+                // Highlight the heading briefly
+                var originalBg = targetHeading.style.backgroundColor;
+                targetHeading.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+                targetHeading.style.transition = 'background-color 0.5s';
+                
+                setTimeout(function() {{
+                    targetHeading.style.backgroundColor = originalBg;
+                }}, 1000);
+                
+                return true;
+            }}
+            return false;
+        }})();
+        """
+        
+        self.web_view.page().runJavaScript(script)

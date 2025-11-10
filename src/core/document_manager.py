@@ -638,3 +638,103 @@ class DocumentManager:
         self._preload_cache.clear()
         self._access_times.clear()
         logger.info("Cleared all caches and access tracking data")
+    
+    def search_documents(self, query: str, case_sensitive: bool = False) -> List[Dict]:
+        """
+        Search all documents for the given query string.
+        Returns a list of dictionaries with document info and match context.
+        """
+        try:
+            if not query.strip():
+                return []
+            
+            results = []
+            
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                
+                # Search in both title and content
+                if case_sensitive:
+                    cursor.execute('''
+                        SELECT id, title, content, updated_at
+                        FROM documents
+                        WHERE title LIKE ? OR content LIKE ?
+                        ORDER BY updated_at DESC
+                    ''', (f'%{query}%', f'%{query}%'))
+                else:
+                    # Case-insensitive search
+                    cursor.execute('''
+                        SELECT id, title, content, updated_at
+                        FROM documents
+                        WHERE LOWER(title) LIKE LOWER(?) OR LOWER(content) LIKE LOWER(?)
+                        ORDER BY updated_at DESC
+                    ''', (f'%{query}%', f'%{query}%'))
+                
+                for row in cursor.fetchall():
+                    doc_id, title, content, updated_at = row
+                    
+                    # Find matches in title
+                    title_matches = []
+                    if case_sensitive:
+                        if query in title:
+                            title_matches.append(title)
+                    else:
+                        if query.lower() in title.lower():
+                            title_matches.append(title)
+                    
+                    # Find matches in content with context
+                    content_matches = self._extract_match_contexts(content, query, case_sensitive)
+                    
+                    if title_matches or content_matches:
+                        results.append({
+                            'id': doc_id,
+                            'title': title,
+                            'updated_at': updated_at,
+                            'title_matches': title_matches,
+                            'content_matches': content_matches,
+                            'match_count': len(title_matches) + len(content_matches)
+                        })
+            
+            logger.info(f"Search for '{query}' found {len(results)} documents")
+            return results
+            
+        except sqlite3.Error as e:
+            logger.error(f"Search failed: {e}")
+            return []
+    
+    def _extract_match_contexts(self, content: str, query: str, case_sensitive: bool = False, 
+                                context_chars: int = 50, max_matches: int = 5) -> List[str]:
+        """
+        Extract context around matches in content.
+        Returns a list of strings showing the query in context.
+        """
+        matches = []
+        search_content = content if case_sensitive else content.lower()
+        search_query = query if case_sensitive else query.lower()
+        
+        start_pos = 0
+        while len(matches) < max_matches:
+            pos = search_content.find(search_query, start_pos)
+            if pos == -1:
+                break
+            
+            # Extract context around the match
+            context_start = max(0, pos - context_chars)
+            context_end = min(len(content), pos + len(query) + context_chars)
+            
+            # Get the context with the actual content (not lowercased)
+            context = content[context_start:context_end]
+            
+            # Add ellipsis if not at start/end
+            if context_start > 0:
+                context = '...' + context
+            if context_end < len(content):
+                context = context + '...'
+            
+            # Replace newlines with spaces for display
+            context = ' '.join(context.split())
+            
+            matches.append(context)
+            start_pos = pos + len(query)
+        
+        return matches

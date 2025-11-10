@@ -29,8 +29,7 @@
             line-height: 1.6;
             padding: 20px;
             word-wrap: break-word;
-            color: #d4d4d4;
-            background-color: #1e1e1e;
+            transition: background-color 0.3s, color 0.3s;
         }
         
         #preview-content {
@@ -42,11 +41,10 @@
             margin-bottom: 16px;
             font-weight: 600;
             line-height: 1.25;
-            color: #569cd6;
         }
         
-        h1 { font-size: 2em; border-bottom: 1px solid #3c3c3c; padding-bottom: 8px; }
-        h2 { font-size: 1.5em; border-bottom: 1px solid #3c3c3c; padding-bottom: 4px; }
+        h1 { font-size: 2em; padding-bottom: 8px; }
+        h2 { font-size: 1.5em; padding-bottom: 4px; }
         h3 { font-size: 1.25em; }
         
         p {
@@ -58,8 +56,6 @@
             border-radius: 3px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-size: 0.9em;
-            background-color: #2d2d2d;
-            color: #ce9178;
         }
         
         pre {
@@ -68,8 +64,6 @@
             overflow-x: auto;
             line-height: 1.45;
             margin: 16px 0;
-            background-color: #2d2d2d;
-            border: 1px solid #3c3c3c;
         }
         
         pre code {
@@ -79,16 +73,14 @@
         }
         
         blockquote {
-            border-left: 4px solid #6a9955;
+            border-left: 4px solid;
             margin: 0 0 16px 0;
             padding-left: 16px;
             font-style: italic;
-            color: #6a9955;
         }
         
         a {
             text-decoration: none;
-            color: #4ec9b0;
         }
         
         a:hover {
@@ -114,16 +106,10 @@
         th, td {
             padding: 8px 12px;
             text-align: left;
-            border: 1px solid #3c3c3c;
         }
         
         th {
             font-weight: 600;
-            background-color: #2d2d2d;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #252526;
         }
         
         ul, ol {
@@ -139,11 +125,178 @@
             border: none;
             height: 1px;
             margin: 24px 0;
+        }
+        
+        /* Dark Theme (default) */
+        body.theme-dark {
+            color: #d4d4d4;
+            background-color: #1e1e1e;
+        }
+        
+        body.theme-dark h1, 
+        body.theme-dark h2, 
+        body.theme-dark h3, 
+        body.theme-dark h4, 
+        body.theme-dark h5, 
+        body.theme-dark h6 {
+            color: #569cd6;
+        }
+        
+        body.theme-dark h1,
+        body.theme-dark h2 {
+            border-bottom: 1px solid #3c3c3c;
+        }
+        
+        body.theme-dark code {
+            background-color: #2d2d2d;
+            color: #ce9178;
+        }
+        
+        body.theme-dark pre {
+            background-color: #2d2d2d;
+            border: 1px solid #3c3c3c;
+        }
+        
+        body.theme-dark blockquote {
+            border-left-color: #6a9955;
+            color: #6a9955;
+        }
+        
+        body.theme-dark a {
+            color: #4ec9b0;
+        }
+        
+        body.theme-dark th, 
+        body.theme-dark td {
+            border: 1px solid #3c3c3c;
+        }
+        
+        body.theme-dark th {
+            background-color: #2d2d2d;
+        }
+        
+        body.theme-dark tr:nth-child(even) {
+            background-color: #252526;
+        }
+        
+        body.theme-dark hr {
             background-color: #3c3c3c;
+        }
+        
+        /* Light Theme */
+        body.theme-light {
+            color: #24292e;
+            background-color: #ffffff;
+        }
+        
+        body.theme-light h1, 
+        body.theme-light h2, 
+        body.theme-light h3, 
+        body.theme-light h4, 
+        body.theme-light h5, 
+        body.theme-light h6 {
+            color: #0366d6;
+        }
+        
+        body.theme-light h1,
+        body.theme-light h2 {
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        body.theme-light code {
+            background-color: #f6f8fa;
+            color: #e36209;
+        }
+        
+        body.theme-light pre {
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+        }
+        
+        body.theme-light blockquote {
+            border-left-color: #6a737d;
+            color: #6a737d;
+        }
+        
+        body.theme-light a {
+            color: #0366d6;
+        }
+        
+        body.theme-light th, 
+        body.theme-light td {
+            border: 1px solid #e1e4e8;
+        }
+        
+        body.theme-light th {
+            background-color: #f6f8fa;
+        }
+        
+        body.theme-light tr:nth-child(even) {
+            background-color: #f6f8fa;
+        }
+        
+        body.theme-light hr {
+            background-color: #e1e4e8;
+        }
+        
+        /* Sepia Theme */
+        body.theme-sepia {
+            color: #5b4636;
+            background-color: #f4ecd8;
+        }
+        
+        body.theme-sepia h1, 
+        body.theme-sepia h2, 
+        body.theme-sepia h3, 
+        body.theme-sepia h4, 
+        body.theme-sepia h5, 
+        body.theme-sepia h6 {
+            color: #8b4513;
+        }
+        
+        body.theme-sepia h1,
+        body.theme-sepia h2 {
+            border-bottom: 1px solid #d4c5a9;
+        }
+        
+        body.theme-sepia code {
+            background-color: #e8dcc0;
+            color: #a0522d;
+        }
+        
+        body.theme-sepia pre {
+            background-color: #e8dcc0;
+            border: 1px solid #d4c5a9;
+        }
+        
+        body.theme-sepia blockquote {
+            border-left-color: #8b7355;
+            color: #8b7355;
+        }
+        
+        body.theme-sepia a {
+            color: #8b4513;
+        }
+        
+        body.theme-sepia th, 
+        body.theme-sepia td {
+            border: 1px solid #d4c5a9;
+        }
+        
+        body.theme-sepia th {
+            background-color: #e8dcc0;
+        }
+        
+        body.theme-sepia tr:nth-child(even) {
+            background-color: #ebe3d0;
+        }
+        
+        body.theme-sepia hr {
+            background-color: #d4c5a9;
         }
     </style>
 </head>
-<body>
+<body class="theme-dark">
     <div id="preview-content">Loading...</div>
     
     <!-- RENDERER_SCRIPT_PLACEHOLDER -->

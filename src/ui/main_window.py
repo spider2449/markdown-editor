@@ -12,6 +12,7 @@ from .editor_widget import EditorWidget
 from .preview_widget_js import PreviewWidgetJS as PreviewWidget
 from .sidebar_widget import SidebarWidget
 from .table_dialog import TableDialog
+from .search_dialog import SearchDialog
 from core.document_manager import DocumentManager
 from core.image_handler import ImageHandler
 from core.settings_manager import SettingsManager
@@ -21,6 +22,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.current_document_id = None
+        self.search_dialog = None
         self.setup_core_components()
         self.setup_ui()
         self.setup_connections()
@@ -125,12 +127,26 @@ class MainWindow(QMainWindow):
         
         edit_menu.addSeparator()
         
+        # Global search
+        search_action = QAction("Search All Documents...", self)
+        search_action.setShortcut(QKeySequence("Ctrl+Shift+F"))
+        search_action.triggered.connect(self.show_search_dialog)
+        edit_menu.addAction(search_action)
+        
+        edit_menu.addSeparator()
+        
         paste_image_action = QAction("Paste Image", self)
         paste_image_action.setShortcut(QKeySequence("Ctrl+Shift+V"))
         paste_image_action.triggered.connect(self.paste_image)
         edit_menu.addAction(paste_image_action)
         
         edit_menu.addSeparator()
+        
+        # Quote action
+        quote_action = QAction("Toggle Quote", self)
+        quote_action.setShortcut(QKeySequence("Ctrl+Q"))
+        quote_action.triggered.connect(self.editor.toggle_quote)
+        edit_menu.addAction(quote_action)
         
         # Table insertion
         table_action = QAction("Insert Table", self)
@@ -277,6 +293,13 @@ class MainWindow(QMainWindow):
         
         toolbar.addSeparator()
         
+        # Quote button
+        quote_action = QAction("Quote", self)
+        quote_action.triggered.connect(self.editor.toggle_quote)
+        toolbar.addAction(quote_action)
+        
+        toolbar.addSeparator()
+        
         # Link and image buttons
         link_action = QAction("Link", self)
         link_action.triggered.connect(lambda: self.insert_markdown("[", "](url)"))
@@ -306,6 +329,7 @@ class MainWindow(QMainWindow):
         self.sidebar.document_created.connect(self.create_document)
         self.sidebar.document_deleted.connect(self.delete_document)
         self.sidebar.document_renamed.connect(self.rename_document)
+        self.sidebar.outline_item_clicked.connect(self.navigate_to_heading)
         
         # Editor connections
         self.editor.text_changed.connect(self.on_text_changed)
@@ -724,6 +748,30 @@ Performance Features:
             self.preview.print_preview()
         except Exception as e:
             QMessageBox.warning(self, "Print Error", f"Failed to print preview: {str(e)}")
+    
+    def navigate_to_heading(self, heading_text: str):
+        """Navigate to a specific heading in both editor and preview"""
+        try:
+            # Scroll editor to heading
+            self.editor.scroll_to_heading(heading_text)
+            
+            # Scroll preview to heading
+            self.preview.scroll_to_heading(heading_text)
+            
+            # Focus the editor
+            self.editor.focus()
+            
+            self.status_bar.showMessage(f"Navigated to: {heading_text}", 2000)
+        except Exception as e:
+            self.status_bar.showMessage(f"Navigation failed: {str(e)}", 2000)
+    
+    def show_search_dialog(self):
+        """Show the global search dialog"""
+        if not self.search_dialog:
+            self.search_dialog = SearchDialog(self.document_manager, self)
+            self.search_dialog.document_selected.connect(self.load_document)
+        
+        self.search_dialog.show_and_focus()
     
     def closeEvent(self, event):
         """Handle application close"""

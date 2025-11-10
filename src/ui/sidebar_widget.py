@@ -17,10 +17,12 @@ class SidebarWidget(QWidget):
     document_created = Signal(str)   # Emits document title
     document_deleted = Signal(int)   # Emits document ID
     document_renamed = Signal(int, str)  # Emits document ID and new title
+    outline_item_clicked = Signal(str)  # Emits heading text
     
     def __init__(self):
         super().__init__()
         self.documents = []
+        self.heading_data = []  # Store heading info for navigation
         self.setup_ui()
     
     def setup_ui(self):
@@ -77,9 +79,17 @@ class SidebarWidget(QWidget):
         layout = QVBoxLayout(widget)
         
         self.outline_list = QListWidget()
+        self.outline_list.itemClicked.connect(self._on_outline_item_clicked)
         layout.addWidget(self.outline_list)
         
         return widget
+    
+    def _on_outline_item_clicked(self, item: QListWidgetItem):
+        """Handle outline item click"""
+        # Get the heading text from item data
+        heading_text = item.data(Qt.UserRole)
+        if heading_text:
+            self.outline_item_clicked.emit(heading_text)
     
     def _create_new_document(self):
         """Handle new document creation"""
@@ -183,6 +193,7 @@ class SidebarWidget(QWidget):
     def update_outline(self, markdown_content: str):
         """Update the outline from markdown content"""
         self.outline_list.clear()
+        self.heading_data = []
         
         # Extract headers from markdown
         headers = re.findall(r'^(#{1,6})\s+(.+)$', markdown_content, re.MULTILINE)
@@ -193,7 +204,16 @@ class SidebarWidget(QWidget):
             item_text = f"{indent}{title}"
             
             item = QListWidgetItem(item_text)
+            # Store the original heading text for navigation
+            item.setData(Qt.UserRole, title.strip())
             self.outline_list.addItem(item)
+            
+            # Store heading data for reference
+            self.heading_data.append({
+                'level': level,
+                'text': title.strip(),
+                'display': item_text
+            })
     
     def select_document(self, doc_id: int):
         """Programmatically select a document"""

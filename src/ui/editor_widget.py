@@ -296,3 +296,96 @@ class EditorWidget(QWidget):
         
         cursor.insertText(table_text)
         self.text_edit.setTextCursor(cursor)
+    
+    def toggle_quote(self):
+        """Toggle blockquote formatting for selected lines"""
+        cursor = self.text_edit.textCursor()
+        
+        # Store original position
+        start_pos = cursor.selectionStart()
+        end_pos = cursor.selectionEnd()
+        
+        # If no selection, select the current line
+        if not cursor.hasSelection():
+            cursor.movePosition(QTextCursor.StartOfBlock)
+            cursor.movePosition(QTextCursor.EndOfBlock, QTextCursor.KeepAnchor)
+            start_pos = cursor.selectionStart()
+            end_pos = cursor.selectionEnd()
+        else:
+            # Expand selection to include full lines
+            cursor.setPosition(start_pos)
+            cursor.movePosition(QTextCursor.StartOfBlock)
+            start_pos = cursor.position()
+            
+            cursor.setPosition(end_pos)
+            cursor.movePosition(QTextCursor.EndOfBlock)
+            end_pos = cursor.position()
+            
+            cursor.setPosition(start_pos)
+            cursor.setPosition(end_pos, QTextCursor.KeepAnchor)
+        
+        # Get selected text
+        selected_text = cursor.selectedText()
+        
+        # Split by paragraph separator (Qt uses U+2029 for newlines)
+        lines = selected_text.split('\u2029')
+        
+        # Check if all non-empty lines are already quoted
+        non_empty_lines = [line for line in lines if line.strip()]
+        all_quoted = all(line.strip().startswith('>') for line in non_empty_lines) if non_empty_lines else False
+        
+        if all_quoted:
+            # Remove quote markers
+            new_lines = []
+            for line in lines:
+                if line.strip().startswith('> '):
+                    # Remove "> " from the beginning
+                    new_lines.append(line[line.index('> ') + 2:] if '> ' in line else line)
+                elif line.strip().startswith('>'):
+                    # Remove ">" from the beginning
+                    new_lines.append(line[line.index('>') + 1:] if '>' in line else line)
+                else:
+                    new_lines.append(line)
+        else:
+            # Add quote markers
+            new_lines = []
+            for line in lines:
+                if line.strip():  # Only quote non-empty lines
+                    new_lines.append('> ' + line)
+                else:
+                    new_lines.append(line)
+        
+        # Replace selected text
+        new_text = '\u2029'.join(new_lines)
+        cursor.insertText(new_text)
+        
+        # Update cursor position
+        self.text_edit.setTextCursor(cursor)
+    
+    def scroll_to_heading(self, heading_text: str):
+        """Scroll to a specific heading in the editor"""
+        import re
+        
+        # Get the full text
+        content = self.text_edit.toPlainText()
+        
+        # Find all headings with their positions
+        pattern = r'^(#{1,6})\s+(.+)$'
+        
+        cursor = self.text_edit.textCursor()
+        cursor.movePosition(QTextCursor.Start)
+        
+        # Search for the heading
+        for match in re.finditer(pattern, content, re.MULTILINE):
+            heading = match.group(2).strip()
+            if heading == heading_text:
+                # Found the heading, move cursor to it
+                position = match.start()
+                cursor.setPosition(position)
+                self.text_edit.setTextCursor(cursor)
+                self.text_edit.ensureCursorVisible()
+                
+                # Highlight the line briefly
+                cursor.select(QTextCursor.LineUnderCursor)
+                self.text_edit.setTextCursor(cursor)
+                break
