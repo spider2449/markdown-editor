@@ -1,0 +1,6 @@
+/.venv
+/build
+/dist
+*.db
+*.spec
+settings.json
