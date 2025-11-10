@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Preview</title>
+    
+    <!-- Marked.js - Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.0.0/marked.min.js"></script>
+    
+    <!-- Highlight.js - Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" id="highlight-theme">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    
+    <style id="theme-styles">
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            word-wrap: break-word;
+            color: #d4d4d4;
+            background-color: #1e1e1e;
+        }
+        
+        #preview-content {
+            max-width: none;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+            color: #569cd6;
+        }
+        
+        h1 { font-size: 2em; border-bottom: 1px solid #3c3c3c; padding-bottom: 8px; }
+        h2 { font-size: 1.5em; border-bottom: 1px solid #3c3c3c; padding-bottom: 4px; }
+        h3 { font-size: 1.25em; }
+        
+        p {
+            margin-bottom: 16px;
+        }
+        
+        code {
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            background-color: #2d2d2d;
+            color: #ce9178;
+        }
+        
+        pre {
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            line-height: 1.45;
+            margin: 16px 0;
+            background-color: #2d2d2d;
+            border: 1px solid #3c3c3c;
+        }
+        
+        pre code {
+            background-color: transparent !important;
+            padding: 0;
+            border-radius: 0;
+        }
+        
+        blockquote {
+            border-left: 4px solid #6a9955;
+            margin: 0 0 16px 0;
+            padding-left: 16px;
+            font-style: italic;
+            color: #6a9955;
+        }
+        
+        a {
+            text-decoration: none;
+            color: #4ec9b0;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            margin: 8px 0;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 16px 0;
+            border-spacing: 0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid #3c3c3c;
+        }
+        
+        th {
+            font-weight: 600;
+            background-color: #2d2d2d;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #252526;
+        }
+        
+        ul, ol {
+            padding-left: 24px;
+            margin: 16px 0;
+        }
+        
+        li {
+            margin: 4px 0;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            margin: 24px 0;
+            background-color: #3c3c3c;
+        }
+    </style>
+</head>
+<body>
+    <div id="preview-content">Loading...</div>
+    
+    <!-- RENDERER_SCRIPT_PLACEHOLDER -->
+</body>
+</html>
