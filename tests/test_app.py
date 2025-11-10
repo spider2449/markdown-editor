@@ -16,7 +16,8 @@ try:
     
     # Test database initialization
     from core.document_manager import DocumentManager
-    dm = DocumentManager("test.db")  # Use file database for testing
+    os.makedirs("tests/doc", exist_ok=True)
+    dm = DocumentManager("tests/doc/test.db")  # Use file database for testing
     print("✓ Database initialization successful")
     
     # Test document operations

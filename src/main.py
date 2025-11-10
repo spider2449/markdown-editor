@@ -16,10 +16,19 @@ from ui.main_window import MainWindow
 
 
 def main():
-    # Register custom URL scheme BEFORE creating QApplication
-    scheme = QWebEngineUrlScheme(b"image")
-    scheme.setFlags(QWebEngineUrlScheme.SecureScheme | QWebEngineUrlScheme.LocalScheme)
-    QWebEngineUrlScheme.registerScheme(scheme)
+    # Register custom URL schemes BEFORE creating QApplication
+    
+    # Register image:// scheme for embedded images
+    image_scheme = QWebEngineUrlScheme(b"image")
+    image_scheme.setFlags(QWebEngineUrlScheme.SecureScheme | QWebEngineUrlScheme.LocalScheme)
+    QWebEngineUrlScheme.registerScheme(image_scheme)
+    
+    # Register local:// scheme for local resources (JS/CSS files)
+    local_scheme = QWebEngineUrlScheme(b"local")
+    local_scheme.setFlags(QWebEngineUrlScheme.SecureScheme | 
+                          QWebEngineUrlScheme.LocalScheme | 
+                          QWebEngineUrlScheme.LocalAccessAllowed)
+    QWebEngineUrlScheme.registerScheme(local_scheme)
     
     app = QApplication(sys.argv)
     app.setApplicationName("Markdown Editor")

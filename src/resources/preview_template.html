@@ -5,28 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Markdown Preview</title>
     
-    <!-- Marked.js - Markdown Parser -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@11.0.0/marked.min.js"></script>
+    <!-- Marked.js - Markdown Parser (Local) -->
+    <script src="local:///js/marked.min.js"></script>
     
-    <!-- Highlight.js - Syntax Highlighting -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" id="highlight-theme">
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <!-- Highlight.js - Syntax Highlighting (Local) -->
+    <link rel="stylesheet" href="local:///js/github-dark.min.css" id="highlight-theme">
+    <script src="local:///js/highlight.min.js"></script>
     
-    <!-- Common programming languages -->
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/python.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/javascript.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/typescript.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/cpp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/csharp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/go.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/rust.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/sql.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/bash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/json.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/xml.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/yaml.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/languages/markdown.min.js"></script>
+    <!-- Common programming languages (Local) -->
+    <script src="local:///js/python.min.js"></script>
+    <script src="local:///js/javascript.min.js"></script>
+    <script src="local:///js/typescript.min.js"></script>
+    <script src="local:///js/java.min.js"></script>
+    <script src="local:///js/cpp.min.js"></script>
+    <script src="local:///js/csharp.min.js"></script>
+    <script src="local:///js/go.min.js"></script>
+    <script src="local:///js/rust.min.js"></script>
+    <script src="local:///js/sql.min.js"></script>
+    <script src="local:///js/bash.min.js"></script>
+    <script src="local:///js/json.min.js"></script>
+    <script src="local:///js/xml.min.js"></script>
+    <script src="local:///js/yaml.min.js"></script>
+    <script src="local:///js/markdown.min.js"></script>
     
     <style id="theme-styles">
         /* Base styles */
@@ -356,6 +356,6 @@
     <div id="preview-content"></div>
     
     <!-- Load our custom renderer -->
-    <script src="qrc:///preview_renderer.js"></script>
+    <script src="local:///preview_renderer.js"></script>
 </body>
 </html>

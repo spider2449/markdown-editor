@@ -13,6 +13,7 @@ from .preview_widget_js import PreviewWidgetJS as PreviewWidget
 from .sidebar_widget import SidebarWidget
 from .table_dialog import TableDialog
 from .search_dialog import SearchDialog
+from .hotkey_dialog import HotkeyDialog
 from core.document_manager import DocumentManager
 from core.image_handler import ImageHandler
 from core.settings_manager import SettingsManager
@@ -172,12 +173,14 @@ class MainWindow(QMainWindow):
         
         # Zoom actions
         zoom_in_action = QAction("Zoom In", self)
-        zoom_in_action.setShortcut(QKeySequence.ZoomIn)
+        # Use Ctrl+= to avoid conflict with direct key handler (Ctrl++ is handled there)
+        zoom_in_action.setShortcut(QKeySequence("Ctrl+="))
         zoom_in_action.triggered.connect(self.editor.zoom_in)
         view_menu.addAction(zoom_in_action)
         
         zoom_out_action = QAction("Zoom Out", self)
-        zoom_out_action.setShortcut(QKeySequence.ZoomOut)
+        # Use only underscore to avoid conflict with direct key handler
+        zoom_out_action.setShortcut(QKeySequence("Ctrl+_"))
         zoom_out_action.triggered.connect(self.editor.zoom_out)
         view_menu.addAction(zoom_out_action)
         
@@ -247,6 +250,14 @@ class MainWindow(QMainWindow):
         stats_action = QAction("Performance Statistics", self)
         stats_action.triggered.connect(self.show_performance_stats)
         view_menu.addAction(stats_action)
+        
+        # Help menu
+        help_menu = menubar.addMenu("Help")
+        
+        hotkeys_action = QAction("Keyboard Shortcuts", self)
+        hotkeys_action.setShortcut(QKeySequence("F1"))
+        hotkeys_action.triggered.connect(self.show_hotkeys)
+        help_menu.addAction(hotkeys_action)
     
     def setup_toolbar(self):
         """Setup the toolbar"""
@@ -772,6 +783,10 @@ Performance Features:
             self.search_dialog.document_selected.connect(self.load_document)
         
         self.search_dialog.show_and_focus()
+    
+    def show_hotkeys(self):
+        """Show the keyboard shortcuts dialog"""
+        HotkeyDialog.show_hotkeys(self)
     
     def closeEvent(self, event):
         """Handle application close"""

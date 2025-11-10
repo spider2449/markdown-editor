@@ -45,6 +45,33 @@ class CustomTextEdit(QTextEdit):
             self.find_requested.emit()
             return
         
+        # Handle zoom shortcuts directly for better reliability
+        elif event.modifiers() == Qt.ControlModifier:
+            # Zoom in: Ctrl++ or Ctrl+=
+            if event.key() in (Qt.Key_Plus, Qt.Key_Equal):
+                parent = self.parent()
+                while parent:
+                    if hasattr(parent, 'zoom_in'):
+                        parent.zoom_in()
+                        return
+                    parent = parent.parent()
+            # Zoom out: Ctrl+- or Ctrl+_
+            elif event.key() in (Qt.Key_Minus, Qt.Key_Underscore):
+                parent = self.parent()
+                while parent:
+                    if hasattr(parent, 'zoom_out'):
+                        parent.zoom_out()
+                        return
+                    parent = parent.parent()
+            # Reset zoom: Ctrl+0
+            elif event.key() == Qt.Key_0:
+                parent = self.parent()
+                while parent:
+                    if hasattr(parent, 'reset_zoom'):
+                        parent.reset_zoom()
+                        return
+                    parent = parent.parent()
+        
         super().keyPressEvent(event)
     
     def set_line_number_widget(self, widget):
@@ -382,10 +409,21 @@ class EditorWidget(QWidget):
                 # Found the heading, move cursor to it
                 position = match.start()
                 cursor.setPosition(position)
+                
+                # Move cursor to the beginning of the line
+                cursor.movePosition(QTextCursor.StartOfLine)
+                
+                # Set the cursor position first
                 self.text_edit.setTextCursor(cursor)
+                
+                # Ensure cursor is visible and centered
                 self.text_edit.ensureCursorVisible()
                 
-                # Highlight the line briefly
+                # Select the entire line for visual feedback
                 cursor.select(QTextCursor.LineUnderCursor)
                 self.text_edit.setTextCursor(cursor)
+                
+                # Set focus to the editor so the selection is visible
+                self.text_edit.setFocus()
+                
                 break

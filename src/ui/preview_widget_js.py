@@ -11,11 +11,72 @@ from PySide6.QtWebEngineCore import (QWebEngineUrlScheme, QWebEngineUrlSchemeHan
                                       QWebEngineProfile, QWebEngineUrlRequestJob, QWebEngineSettings)
 from PySide6.QtCore import QUrl, QBuffer, QIODevice, QByteArray, QTimer
 
-# Note: We don't need to register custom schemes for local file access
-# Qt WebEngine can load local files directly
-
-
-# No custom scheme handler needed - we'll embed JavaScript directly
+class ResourceSchemeHandler(QWebEngineUrlSchemeHandler):
+    """Custom URL scheme handler for local resources (local://)"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.resources_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
+        self._buffers = []  # Keep buffers alive
+    
+    def requestStarted(self, request: QWebEngineUrlRequestJob):
+        """Handle resource requests"""
+        try:
+            url = request.requestUrl()
+            path = url.path()
+            
+            # Remove leading slash
+            if path.startswith('/'):
+                path = path[1:]
+            
+            # Build full file path
+            file_path = os.path.abspath(os.path.join(self.resources_dir, path))
+            
+            if not os.path.exists(file_path):
+                print(f"Resource not found: {file_path}")
+                request.fail(QWebEngineUrlRequestJob.Error.UrlNotFound)
+                return
+            
+            # Read file content
+            with open(file_path, 'rb') as f:
+                content = f.read()
+            
+            # Determine MIME type
+            mime_type = self._get_mime_type(file_path)
+            
+            # Create buffer with request as parent to keep it alive
+            buffer = QBuffer(request)
+            buffer.setData(QByteArray(content))
+            buffer.open(QIODevice.OpenModeFlag.ReadOnly)
+            
+            # Keep reference to buffer
+            self._buffers.append(buffer)
+            if len(self._buffers) > 100:  # Limit buffer cache
+                self._buffers.pop(0)
+            
+            request.reply(mime_type.encode(), buffer)
+            
+        except Exception as e:
+            print(f"Error loading resource {url.toString()}: {e}")
+            import traceback
+            traceback.print_exc()
+            request.fail(QWebEngineUrlRequestJob.Error.RequestFailed)
+    
+    def _get_mime_type(self, file_path: str) -> str:
+        """Get MIME type based on file extension"""
+        ext = os.path.splitext(file_path)[1].lower()
+        mime_types = {
+            '.js': 'application/javascript',
+            '.css': 'text/css',
+            '.html': 'text/html',
+            '.json': 'application/json',
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.gif': 'image/gif',
+            '.svg': 'image/svg+xml'
+        }
+        return mime_types.get(ext, 'application/octet-stream')
 
 
 class PreviewWidgetJS(QWidget):
@@ -32,8 +93,20 @@ class PreviewWidgetJS(QWidget):
         self._update_timer.setSingleShot(True)
         self._update_timer.timeout.connect(self._process_pending_updates)
         self._update_timer.setInterval(100)  # 100ms debounce
+        
+        # Setup resource scheme handler
+        self._setup_resource_handler()
 
         self.setup_ui()
+    
+    def _setup_resource_handler(self):
+        """Setup custom URL scheme handler for local resources"""
+        # Get the default profile
+        profile = QWebEngineProfile.defaultProfile()
+        
+        # Create and install resource handler
+        self.resource_handler = ResourceSchemeHandler(self)
+        profile.installUrlSchemeHandler(b"local", self.resource_handler)
 
     def setup_ui(self):
         """Setup the preview UI"""
@@ -60,29 +133,17 @@ class PreviewWidgetJS(QWidget):
         self._load_template()
 
     def _load_template(self):
-        """Load the HTML template with embedded JavaScript"""
-        template_path = os.path.join(os.path.dirname(__file__), '..', 'resources', 'preview_template_simple.html')
-        renderer_path = os.path.join(os.path.dirname(__file__), '..', 'resources', 'preview_renderer.js')
+        """Load the HTML template with local resources"""
+        template_path = os.path.join(os.path.dirname(__file__), '..', 'resources', 'preview_template.html')
 
         try:
             # Read template
             with open(template_path, 'r', encoding='utf-8') as f:
                 html_content = f.read()
 
-            # Read JavaScript renderer
-            with open(renderer_path, 'r', encoding='utf-8') as f:
-                js_content = f.read()
-
-            # Embed JavaScript into template
-            html_content = html_content.replace(
-                '<!-- RENDERER_SCRIPT_PLACEHOLDER -->',
-                f'<script>\n{js_content}\n</script>'
-            )
-
-            # Load HTML with base URL for external resources (CDN)
-            base_url = QUrl("https://localhost/")
+            # Load HTML with local:// base URL for local resources
+            base_url = QUrl("local:///")
             self.web_view.setHtml(html_content, base_url)
-            print("✓ Template loaded with embedded JavaScript")
         except Exception as e:
             print(f"✗ Error loading template: {e}")
             import traceback
@@ -238,7 +299,7 @@ class PreviewWidgetJS(QWidget):
         // Update highlight.js theme
         var highlightLink = document.getElementById('highlight-theme');
         if (highlightLink) {{
-            highlightLink.href = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/{highlight_theme}.min.css';
+            highlightLink.href = 'local:///js/{highlight_theme}.min.css';
         }}
 
         // Update renderer theme

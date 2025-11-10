@@ -23,7 +23,9 @@ def main():
     app = QApplication(sys.argv)
     
     # Create test components
-    doc_manager = DocumentManager()
+    import os
+    os.makedirs("tests/doc", exist_ok=True)
+    doc_manager = DocumentManager("tests/doc/debug_paste_detailed.db")
     image_handler = ImageHandler(doc_manager)
     
     # Create a test document

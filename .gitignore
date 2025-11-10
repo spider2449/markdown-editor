@@ -3,12 +3,13 @@
 /dist
 *.db
 *.spec
+tests/doc/
 
 *.pyc
 *.pyo
 *.pyd
 *.egg-info
-**/__pycache__/*
+**/__pycache__
 
 
 settings.json
